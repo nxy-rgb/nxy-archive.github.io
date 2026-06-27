@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact [NXY]</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="nxy-header">
+  <div class="handle">NXY // Personal Research Log</div>
+  <div class="subline">DO NOT SHARE THIS URL</div>
+</header>
+
+<nav class="nxy-nav" aria-label="Primary">
+  <a href="index.html">HOME</a>
+  <a href="documentation.html">DOCUMENTATION</a>
+  <a href="audio.html">AUDIO</a>
+  <a href="contact.html" aria-current="page">CONTACT [NXY]</a>
+</nav>
+
+<main class="shell">
+
+  <div class="block">
+    <h2>leave a message</h2>
+    <p>I can't give you a working email address right now. The last two stopped being safe to use. This form queues a message locally &mdash; I'll pick it up if and when I can.</p>
+    <p class="timestamp">I can't promise it reaches me unaltered. I can't promise anything reaches me unaltered anymore.</p>
+
+    <form class="nxy-form" id="nxy-contact-form">
+      <label for="msg">message</label>
+      <textarea id="msg" rows="5"></textarea>
+      <button type="submit">queue message</button>
+    </form>
+
+    <div class="pending-asset" id="nxy-contact-result" style="display:none;"></div>
+  </div>
+
+</main>
+
+<footer class="nxy-footer">
+  <p>if you get a reply and it doesn't sound like me, tell someone.</p>
+</footer>
+
+<script>
+  document.getElementById('nxy-contact-form').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var box = document.getElementById('nxy-contact-result');
+    box.style.display = 'block';
+    box.textContent = 'MESSAGE QUEUED. DELIVERY NOT GUARANTEED.';
+  });
+</script>
+
+</body>
+</html>
