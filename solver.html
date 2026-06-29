@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cooperative Puzzle Solver // NXY</title>
+<style>
+  :root {
+    --bg:        #0B0F0C;
+    --bg-panel:  #0F1410;
+    --green:     #4FE08A;
+    --green-dim: #2E7A52;
+    --text:      #B9E8C9;
+    --text-dim:  #6E9C7C;
+    --font-mono: 'Courier New', Courier, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 14px;
+    line-height: 1.6;
+  }
+  .shell { max-width: 720px; margin: 0 auto; padding: 0 18px 60px; }
+  header { border-bottom: 1px dashed var(--green-dim); padding: 22px 18px 16px; max-width: 720px; margin: 0 auto; }
+  .handle { color: var(--green); font-weight: bold; font-size: 16px; }
+  .subline { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+  .block {
+    background: var(--bg-panel);
+    border: 1px solid var(--green-dim);
+    padding: 18px 20px;
+    margin: 22px 0;
+  }
+  .block h2 {
+    color: var(--green);
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    margin: 0 0 12px;
+    border-bottom: 1px dashed var(--green-dim);
+    padding-bottom: 8px;
+  }
+  
+  .code-input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  input[type="text"] {
+    flex: 1;
+    background: var(--bg);
+    border: 1px solid var(--green-dim);
+    color: var(--green);
+    padding: 8px;
+    font-family: var(--font-mono);
+  }
+  button {
+    background: var(--green-dim);
+    border: 1px solid var(--green);
+    color: var(--green);
+    font-family: var(--font-mono);
+    padding: 8px 16px;
+    cursor: pointer;
+  }
+  button:hover { background: var(--green); color: var(--bg); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  
+  #codes-list {
+    background: var(--bg);
+    border: 1px solid var(--green-dim);
+    padding: 10px;
+    margin-bottom: 12px;
+    min-height: 40px;
+    max-height: 150px;
+    overflow-y: auto;
+    font-size: 12px;
+  }
+  .code-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px;
+    border-bottom: 1px dashed var(--green-dim);
+  }
+  .code-item:last-child { border-bottom: none; }
+  .code-remove {
+    color: #E0C24F;
+    cursor: pointer;
+    font-size: 10px;
+  }
+  .code-remove:hover { color: #FF6B6B; }
+  
+  #result {
+    margin-top: 18px;
+    padding: 14px;
+    background: #060807;
+    border-left: 2px solid var(--green);
+    display: none;
+  }
+  #result.show { display: block; }
+  .result-label { color: var(--text-dim); font-size: 11px; }
+  .result-value { 
+    color: var(--green); 
+    font-weight: bold;
+    font-size: 18px;
+    margin-top: 8px;
+    letter-spacing: 2px;
+  }
+  
+  .error { color: #E0C24F; }
+  .success { color: var(--green); }
+  
+  footer { color: var(--text-dim); font-size: 11px; padding: 20px 18px 50px; max-width: 720px; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="handle">NXY // COOPERATIVE PUZZLE SOLVER</div>
+  <div class="subline">XOR your codes to reveal the researcher</div>
+</header>
+
+<main class="shell">
+
+  <div class="block">
+    <h2>How This Works</h2>
+    <p>When players share their Candidate Reference Numbers from the CRC Assessment, we can XOR them together to reveal encrypted messages.</p>
+    <p>Each player's code is in the format <span class="success">347XXX</span> where XXX are the random last 3 digits.</p>
+    <p>Enter multiple codes below and XOR them together. When all 5 puzzle codes are combined, you'll discover who wrote the research paper.</p>
+  </div>
+
+  <div class="block">
+    <h2>Solve the Cipher</h2>
+    
+    <div>
+      <label for="code-input">Enter a Candidate Reference Number:</label><br>
+      <div class="code-input-group">
+        <input type="text" id="code-input" placeholder="347031" maxlength="6">
+        <button onclick="addCode()">Add Code</button>
+      </div>
+    </div>
+    
+    <div>
+      <label>Codes entered (click to remove):</label>
+      <div id="codes-list">
+        <p style="color: var(--text-dim); font-size: 11px; padding: 4px;">No codes yet.</p>
+      </div>
+    </div>
+    
+    <div>
+      <button onclick="solveXOR()" id="solve-btn" disabled>Solve XOR</button>
+      <button onclick="clearCodes()">Clear All</button>
+    </div>
+    
+    <div id="result">
+      <div class="result-label">XOR RESULT:</div>
+      <div id="result-number" class="result-value"></div>
+      <div class="result-label" style="margin-top: 12px;">DECODED:</div>
+      <div id="result-message" class="result-value"></div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <p><strong>NXY's note:</strong> When enough players share their codes, the pattern becomes clear. The researcher's identity is hidden in the mathematics. XOR them all together. The answer is in the numbers.</p>
+</footer>
+
+<script>
+var codes = [];
+
+// Special mappings for cooperative puzzle results
+var xorMappings = {
+  289: "YUKI HAGURE",      // All 5: 031 ^ 089 ^ 156 ^ 200 ^ 178 = 289
+  206: "LISTEN",
+  201: "WATCH",
+  256: "KOTONE",
+  183: "3:47"
+};
+
+function addCode() {
+  var input = document.getElementById('code-input');
+  var val = input.value.trim();
+  
+  if (!/^\d{6}$/.test(val)) {
+    alert('Format: 6 digits (e.g., 347031)');
+    return;
+  }
+  
+  if (val.substring(0, 3) !== '347') {
+    alert('Code must start with 347');
+    return;
+  }
+  
+  if (codes.includes(val)) {
+    alert('This code is already entered');
+    return;
+  }
+  
+  codes.push(val);
+  input.value = '';
+  renderCodes();
+  updateSolveButton();
+}
+
+function removeCode(index) {
+  codes.splice(index, 1);
+  renderCodes();
+  updateSolveButton();
+  document.getElementById('result').classList.remove('show');
+}
+
+function renderCodes() {
+  var list = document.getElementById('codes-list');
+  
+  if (codes.length === 0) {
+    list.innerHTML = '<p style="color: var(--text-dim); font-size: 11px; padding: 4px;">No codes yet.</p>';
+    return;
+  }
+  
+  var html = codes.map((code, i) => {
+    var tail = code.substring(3);
+    return `<div class="code-item">
+      <span>${code} (tail: ${tail})</span>
+      <span class="code-remove" onclick="removeCode(${i})">[remove]</span>
+    </div>`;
+  }).join('');
+  
+  list.innerHTML = html;
+}
+
+function updateSolveButton() {
+  document.getElementById('solve-btn').disabled = codes.length < 2;
+}
+
+function extractTail(code) {
+  return parseInt(code.substring(3));
+}
+
+function solveXOR() {
+  if (codes.length < 2) {
+    alert('Need at least 2 codes');
+    return;
+  }
+  
+  var tails = codes.map(extractTail);
+  var result = 0;
+  tails.forEach(function(tail) {
+    result ^= tail;
+  });
+  
+  var message = xorMappings[result] || decodeASCII(result) || '[ENCRYPTED: ' + result + ']';
+  
+  document.getElementById('result-number').textContent = result;
+  document.getElementById('result-message').textContent = message;
+  document.getElementById('result').classList.add('show');
+}
+
+function decodeASCII(num) {
+  if (num >= 32 && num <= 126) {
+    return chr(num);
+  }
+  return null;
+}
+
+function chr(code) {
+  return String.fromCharCode(code);
+}
+
+function clearCodes() {
+  codes = [];
+  renderCodes();
+  updateSolveButton();
+  document.getElementById('result').classList.remove('show');
+}
+
+// Allow Enter key to add code
+document.getElementById('code-input').addEventListener('keypress', function(e) {
+  if (e.key === 'Enter') addCode();
+});
+
+// Initialize
+renderCodes();
+updateSolveButton();
+</script>
+
+</body>
+</html>
