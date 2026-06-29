@@ -84,6 +84,14 @@
   .error { color: #E0C24F; }
   .success { color: var(--green); }
   footer { color: var(--text-dim); font-size: 11px; padding: 20px 18px 50px; max-width: 720px; margin: 0 auto; }
+  header { border-bottom: 1px dashed var(--green-dim); padding: 22px 18px 16px; max-width: 720px; margin: 0 auto; }
+  .handle { color: var(--green); font-weight: bold; font-size: 16px; }
+  .subline { color: var(--text-dim); font-size: 12px; margin-top: 4px; }
+  .nxy-nav { display: flex; gap: 20px; padding: 12px 18px; max-width: 720px; margin: 0 auto; border-bottom: 1px dashed var(--green-dim); }
+  .nxy-nav a { color: var(--green); text-decoration: none; font-size: 12px; letter-spacing: 0.04em; }
+  .nxy-nav a:hover { color: var(--text); }
+  .nxy-nav a[aria-current="page"] { color: var(--text); border-bottom: 1px solid var(--green); }
+  .shell { max-width: 720px; margin: 0 auto; padding: 0 18px 60px; }
 </style>
 </head>
 <body>
@@ -93,11 +101,20 @@
   <div class="subline">Extract hidden messages from images</div>
 </header>
 
+<nav class="nxy-nav" aria-label="Primary">
+  <a href="index.html">HOME</a>
+  <a href="documentation.html">DOCUMENTATION</a>
+  <a href="audio.html">AUDIO</a>
+  <a href="decoder.html" aria-current="page">DECODER</a>
+  <a href="solver.html">SOLVER</a>
+  <a href="contact.html">CONTACT [NXY]</a>
+</nav>
+
 <main class="shell">
 
   <div class="block">
     <h2>How This Works</h2>
-    <p>Images found may contain hidden text messages encoded in the least-significant bit (LSB) of the red color channel. Each pixel's red value ends in either a 0 or a 1. That bit is the message.</p>
+    <p>Images found in the may contain hidden text messages encoded in the least-significant bit (LSB) of the red color channel. Each pixel's red value ends in either a 0 or a 1 and that bit is the message.</p>
     <p>This tool reads those bits in row-major order (left to right, top to bottom) and reconstructs the original text.</p>
     <p class="error">NOTE: Only PNG/lossless images will work. JPEG compression destroys the hidden bits. If you're trying to decode a JPEG, find the PNG version.</p>
   </div>
